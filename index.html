@@ -1,439 +1,887 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
-
-export const Route = createFileRoute('/')({
-  component: LandingPage,
-})
-
-/* ─── Scroll reveal hook ─────────────────────────── */
-function useReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll<HTMLElement>('.reveal')
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry, i) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => entry.target.classList.add('visible'), i * 80)
-          }
-        })
-      },
-      { threshold: 0.1 },
-    )
-    els.forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
-  }, [])
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DoseCerta -- Nunca fique sem seus remedios</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pill: #00C896;
+  --pill-dark: #009E78;
+  --alert: #FF5C5C;
+  --gold: #F5C842;
+  --navy: #0D1B2A;
+  --navy-mid: #1A2E42;
+  --navy-light: #243547;
+  --cream: #F9F5EC;
+  --cream-dark: #EEE9DC;
+  --text-muted: #7A8FA6;
 }
 
-/* ─── Netlify Forms encode helper ────────────────── */
-function encode(data: Record<string, string>) {
-  return Object.entries(data)
-    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
-    .join('&')
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--navy);
+  overflow-x: hidden;
 }
 
-/* ─── Root ───────────────────────────────────────── */
-function LandingPage() {
-  useReveal()
-  return (
-    <>
-      <Nav />
-      <Hero />
-      <Features />
-      <HowItWorks />
-      <AlertsSection />
-      <CtaSection />
-    </>
-  )
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 20px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(13,27,42,.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.nav-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--pill); }
+.nav-links { display: flex; gap: 36px; list-style: none; }
+.nav-links a {
+  color: rgba(255,255,255,.6);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color .2s;
+}
+.nav-links a:hover { color: #fff; }
+.nav-cta {
+  background: var(--pill);
+  color: var(--navy);
+  padding: 10px 22px;
+  border-radius: 100px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: box-shadow .2s, transform .2s;
+}
+.nav-cta:hover {
+  box-shadow: 0 8px 24px rgba(0,200,150,.4);
+  transform: translateY(-1px);
 }
 
-/* ─── NAV ────────────────────────────────────────── */
-function Nav() {
-  return (
-    <nav>
-      <a href="#" className="nav-logo">
-        Dose<span>Certa</span>
-      </a>
-      <ul className="nav-links">
-        <li><a href="#funcoes">Funcoes</a></li>
-        <li><a href="#como">Como funciona</a></li>
-        <li><a href="#alertas">Alertas</a></li>
-      </ul>
-      <a href="#cta" className="nav-cta">Criar conta gratis &rarr;</a>
-    </nav>
-  )
+/* HERO */
+.hero {
+  min-height: 100vh;
+  background: var(--navy);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  overflow: hidden;
 }
-
-/* ─── HERO ───────────────────────────────────────── */
-function Hero() {
-  return (
-    <section className="hero">
-      <div className="hero-left">
-        <div className="badge">
-          <div className="badge-dot" />
-          Acesso antecipado &mdash; teste primeiro
-        </div>
-        <h1>
-          Nunca fique sem<br />seus <em>remedios.</em>
-        </h1>
-        <p className="hero-sub">
-          O app que calcula quando seus remedios vao acabar, avisa antes e
-          encontra a melhor opcao de compra com entrega.
-        </p>
-        <div className="cta-row">
-          <a href="#cta" className="btn-primary">
-            ✉ Criar conta gratuita
-          </a>
-          <a href="#como" className="btn-ghost">
-            Ver como funciona &rarr;
-          </a>
-          <a href="/buscar" className="btn-ghost" style={{ borderColor: 'rgba(0,200,150,.4)', color: 'var(--pill)' }}>
-            💊 Buscar precos
-          </a>
-        </div>
-        <div className="stat-row">
-          <div className="stat-item">
-            <strong>ate 30%</strong>
-            <span>de economia potencial</span>
-          </div>
-          <div className="stat-item">
-            <strong>R$0</strong>
-            <span>para testar</span>
-          </div>
-          <div className="stat-item">
-            <strong>3+ dias</strong>
-            <span>de aviso antecipado</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="hero-right">
-        <div className="phone-wrap">
-          {/* Floating cards */}
-          <div className="float-card price-card">
-            <div className="float-label">💊 Omeprazol 20mg</div>
-            <div className="float-price">R$ 12,90</div>
-            <div className="float-savings">Opcao mais em conta encontrada</div>
-          </div>
-          <div className="float-card alert-card">
-            <div className="float-alert-icon">⏰</div>
-            <div className="float-alert-msg">
-              Atenolol acaba em<br /><strong>3 dias</strong> &mdash; hora de comprar
-            </div>
-          </div>
-
-          {/* Phone mockup */}
-          <div className="phone">
-            <div className="phone-notch" />
-            <div className="phone-screen-top">
-              <div className="phone-greeting">Bom dia,</div>
-              <div className="phone-name">Maria Silva 👋</div>
-              <div className="next-dose">
-                <div className="next-dose-label">Proxima dose</div>
-                <div className="next-dose-name">Metformina 850mg</div>
-                <div className="next-dose-time">⏰ Hoje as 14:00 · 1 comprimido</div>
-              </div>
-            </div>
-            <div className="med-list">
-              <MedCard icon="💊" cls="green" name="Atenolol 25mg" detail="1x ao dia · manha" stockCls="low" stock="3 dias" />
-              <MedCard icon="🔴" cls="red" name="Losartana 50mg" detail="2x ao dia" stockCls="out" stock="Acabou!" />
-              <MedCard icon="✨" cls="gold" name="Omeprazol 20mg" detail="1x ao dia · em jejum" stockCls="ok" stock="28 dias" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -200px; right: -200px;
+  width: 700px; height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,200,150,.18) 0%, transparent 70%);
+  pointer-events: none;
 }
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -150px; left: -100px;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245,200,66,.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 60px 80px 80px;
+  z-index: 2;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,200,150,.12);
+  border: 1px solid rgba(0,200,150,.3);
+  color: var(--pill);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+  margin-bottom: 32px;
+  width: fit-content;
+}
+.badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--pill);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .5; transform: scale(1.3); }
+}
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(42px, 5vw, 68px);
+  font-weight: 900;
+  line-height: 1.05;
+  color: #fff;
+  margin-bottom: 24px;
+}
+h1 em { font-style: italic; color: var(--pill); }
+.hero-sub {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  max-width: 440px;
+  margin-bottom: 48px;
+}
+.cta-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.btn-primary {
+  background: var(--pill);
+  color: var(--navy);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 16px 32px;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform .2s, box-shadow .2s;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0,200,150,.4);
+}
+.btn-ghost {
+  background: transparent;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  padding: 16px 28px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.2);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: border-color .2s, background .2s;
+}
+.btn-ghost:hover {
+  border-color: rgba(255,255,255,.5);
+  background: rgba(255,255,255,.06);
+}
+.stat-row {
+  display: flex;
+  gap: 40px;
+  margin-top: 56px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.stat-item strong {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+}
+.stat-item span { font-size: 13px; color: var(--text-muted); }
 
-function MedCard({
-  icon, cls, name, detail, stockCls, stock,
-}: {
-  icon: string; cls: string; name: string
-  detail: string; stockCls: string; stock: string
-}) {
-  return (
-    <div className="med-card">
-      <div className={`med-icon ${cls}`}>{icon}</div>
-      <div className="med-info">
-        <div className="med-name">{name}</div>
-        <div className="med-detail">{detail}</div>
-      </div>
-      <span className={`med-stock ${stockCls}`}>{stock}</span>
+/* PHONE */
+.hero-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 60px 60px 20px;
+  z-index: 2;
+}
+.phone-wrap {
+  position: relative;
+  animation: floatphone 4s ease-in-out infinite;
+}
+@keyframes floatphone {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.phone {
+  width: 280px;
+  background: var(--navy-mid);
+  border-radius: 44px;
+  border: 2px solid rgba(255,255,255,.1);
+  padding: 20px 16px;
+  box-shadow: 0 40px 80px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.04);
+  position: relative;
+}
+.phone-notch {
+  width: 80px; height: 24px;
+  background: var(--navy);
+  border-radius: 100px;
+  margin: 0 auto 20px;
+}
+.phone-screen-top {
+  background: linear-gradient(135deg, #0A2540, #0D3055);
+  border-radius: 24px;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.phone-greeting { font-size: 12px; color: rgba(255,255,255,.5); margin-bottom: 2px; }
+.phone-name {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 16px;
+}
+.next-dose {
+  background: rgba(0,200,150,.15);
+  border: 1px solid rgba(0,200,150,.3);
+  border-radius: 14px;
+  padding: 14px;
+}
+.next-dose-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--pill);
+  margin-bottom: 6px;
+}
+.next-dose-name { font-size: 15px; font-weight: 500; color: #fff; margin-bottom: 4px; }
+.next-dose-time { font-size: 13px; color: rgba(255,255,255,.5); display: flex; align-items: center; gap: 4px; }
+.med-list { display: flex; flex-direction: column; gap: 8px; }
+.med-card {
+  background: var(--navy-light);
+  border-radius: 16px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(255,255,255,.06);
+}
+.med-icon {
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.med-icon.green { background: rgba(0,200,150,.15); }
+.med-icon.red { background: rgba(255,92,92,.15); }
+.med-icon.gold { background: rgba(245,200,66,.15); }
+.med-info { flex: 1; }
+.med-name { font-size: 13px; font-weight: 500; color: #fff; margin-bottom: 2px; }
+.med-detail { font-size: 11px; color: var(--text-muted); }
+.med-stock { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 100px; }
+.med-stock.ok { background: rgba(0,200,150,.15); color: var(--pill); }
+.med-stock.low { background: rgba(245,200,66,.15); color: #F5C842; }
+.med-stock.out { background: rgba(255,92,92,.15); color: var(--alert); }
+
+/* FLOATING CARDS */
+.float-card {
+  position: absolute;
+  background: #fff;
+  border-radius: 16px;
+  padding: 12px 16px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.25);
+  min-width: 170px;
+}
+.float-card.price-card {
+  right: -80px;
+  top: 30%;
+  animation: floatcard1 5s ease-in-out infinite;
+}
+.float-card.alert-card {
+  left: -80px;
+  bottom: 25%;
+  animation: floatcard2 5s ease-in-out infinite;
+}
+@keyframes floatcard1 {
+  0%,100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+@keyframes floatcard2 {
+  0%,100% { transform: translateY(0) rotate(1deg); }
+  50% { transform: translateY(-8px) rotate(-1deg); }
+}
+.float-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-bottom: 6px; }
+.float-price { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--navy); }
+.float-savings { font-size: 11px; color: var(--pill-dark); margin-top: 2px; }
+.float-alert-icon { font-size: 20px; margin-bottom: 4px; }
+.float-alert-msg { font-size: 12px; font-weight: 500; color: var(--navy); line-height: 1.4; }
+
+/* FEATURES */
+section.features { padding: 100px 80px; background: var(--cream); }
+.section-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--pill-dark);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(32px, 4vw, 50px);
+  font-weight: 900;
+  line-height: 1.1;
+  max-width: 520px;
+  margin-bottom: 60px;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.feature-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 36px 32px;
+  border: 1px solid var(--cream-dark);
+  transition: transform .25s, box-shadow .25s;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(13,27,42,.1);
+}
+.feature-card.accent {
+  background: var(--navy);
+  border-color: transparent;
+}
+.feature-card.accent .feature-title { color: #fff; }
+.feature-card.accent .feature-desc { color: var(--text-muted); }
+.feature-emoji { font-size: 32px; margin-bottom: 20px; display: block; }
+.feature-title {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--navy);
+}
+.feature-desc { font-size: 15px; line-height: 1.65; color: #5A6A7A; }
+.feature-tag {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: rgba(0,200,150,.12);
+  color: var(--pill-dark);
+}
+.feature-card.accent .feature-tag { background: rgba(0,200,150,.2); color: var(--pill); }
+
+/* HOW IT WORKS */
+section.how {
+  padding: 80px;
+  background: var(--navy);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.how-left .section-label { color: var(--pill); }
+.steps { display: flex; flex-direction: column; gap: 28px; margin-top: 40px; }
+.step { display: flex; gap: 20px; align-items: flex-start; }
+.step-num {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(0,200,150,.15);
+  border: 1px solid rgba(0,200,150,.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--pill);
+  flex-shrink: 0;
+}
+.step-title { font-weight: 500; color: #fff; margin-bottom: 4px; font-size: 16px; }
+.step-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+/* PRICE TABLE */
+.price-table {
+  background: var(--navy-mid);
+  border-radius: 28px;
+  padding: 32px;
+  border: 1px solid rgba(255,255,255,.08);
+}
+.price-table-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+.price-table-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.price-table-disclaimer { font-size: 11px; color: rgba(255,255,255,.25); margin-top: 12px; font-style: italic; }
+.price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.06);
+  cursor: pointer;
+  transition: background .2s;
+}
+.price-row:hover { background: rgba(255,255,255,.08); }
+.price-row.best { background: rgba(0,200,150,.12); border-color: rgba(0,200,150,.25); }
+.price-pharmacy { display: flex; align-items: center; gap: 10px; }
+.pharmacy-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+.pharmacy-name { font-size: 14px; font-weight: 500; color: #fff; }
+.pharmacy-delivery { font-size: 11px; color: var(--text-muted); }
+.price-value { text-align: right; }
+.price-amount { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: #fff; }
+.price-best-badge { font-size: 10px; color: var(--pill); font-weight: 500; }
+.price-old { font-size: 11px; color: var(--text-muted); text-decoration: line-through; }
+
+/* ALERTS SECTION */
+section.alert-section {
+  padding: 80px;
+  background: var(--cream);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.alert-mockups { display: flex; flex-direction: column; gap: 16px; }
+.notif-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 18px 20px;
+  border: 1px solid var(--cream-dark);
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  box-shadow: 0 4px 16px rgba(13,27,42,.06);
+  transition: transform .2s;
+}
+.notif-card:hover { transform: translateX(4px); }
+.notif-icon-wrap {
+  width: 44px; height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.notif-icon-wrap.green { background: #E8FBF5; }
+.notif-icon-wrap.red { background: #FFF0F0; }
+.notif-icon-wrap.blue { background: #EFF5FF; }
+.notif-title { font-weight: 500; font-size: 14px; color: var(--navy); margin-bottom: 3px; }
+.notif-msg { font-size: 13px; color: #6A7A8A; line-height: 1.5; }
+.notif-time { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+
+/* CTA SECTION */
+section.cta-section {
+  padding: 100px 80px;
+  background: linear-gradient(135deg, var(--navy), #0A2540);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+section.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px; height: 400px;
+  background: radial-gradient(ellipse, rgba(0,200,150,.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+.cta-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(36px, 5vw, 58px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+.cta-title em { color: var(--pill); font-style: italic; }
+.cta-sub {
+  font-size: 17px;
+  color: var(--text-muted);
+  max-width: 440px;
+  margin: 0 auto 40px;
+  line-height: 1.7;
+}
+.input-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.email-input {
+  flex: 1;
+  padding: 16px 20px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: border-color .2s;
+}
+.email-input::placeholder { color: rgba(255,255,255,.35); }
+.email-input:focus { border-color: var(--pill); }
+.success-msg { display: none; color: var(--pill); font-size: 15px; margin-top: 16px; font-weight: 500; }
+
+/* SCROLL REVEAL */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  nav { padding: 16px 24px; }
+  .nav-links { display: none; }
+  .hero { grid-template-columns: 1fr; min-height: auto; }
+  .hero-left { padding: 120px 28px 40px; }
+  .hero-right { padding: 0 28px 60px; }
+  .float-card { display: none; }
+  section.features { padding: 60px 28px; }
+  .features-grid { grid-template-columns: 1fr; }
+  section.how { grid-template-columns: 1fr; padding: 60px 28px; gap: 40px; }
+  section.alert-section { grid-template-columns: 1fr; padding: 60px 28px; }
+  section.cta-section { padding: 60px 28px; }
+  .input-row { flex-direction: column; }
+  .stat-row { gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Dose<span>Certa</span></a>
+  <ul class="nav-links">
+    <li><a href="#funcoes">Funcoes</a></li>
+    <li><a href="#como">Como funciona</a></li>
+    <li><a href="#alertas">Alertas</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Criar conta gratis &rarr;</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="badge">
+      <div class="badge-dot"></div>
+      Acesso antecipado &mdash; teste primeiro
     </div>
-  )
-}
-
-/* ─── FEATURES ───────────────────────────────────── */
-const FEATURE_CARDS = [
-  {
-    emoji: '🧮',
-    title: 'Calcula automaticamente',
-    desc: 'Informe sua dosagem e quantidade. O app calcula exatamente quando seu estoque acaba  --  sem planilha, sem conta de cabeca.',
-    tag: 'Calculo inteligente',
-    accent: false,
-  },
-  {
-    emoji: '🔔',
-    title: 'Avisa antes de acabar',
-    desc: 'Notificacoes com 7, 3 e 1 dia de antecedencia. Voce nunca mais vai chegar na ultima caixa sem saber o que fazer.',
-    tag: 'Alertas inteligentes',
-    accent: true,
-  },
-  {
-    emoji: '💰',
-    title: 'Encontra opcoes de compra',
-    desc: 'Mostra alternativas de compra com entrega na sua cidade. Compare e escolha o que faz mais sentido para voce.',
-    tag: 'Comparacao de precos',
-    accent: false,
-  },
-  {
-    emoji: '👨‍👩‍👧',
-    title: 'Para toda a familia',
-    desc: 'Cadastre os remedios de todos. Ideal para quem cuida dos pais, filhos ou qualquer pessoa que depende de medicacao continua.',
-    tag: 'Multi-perfil',
-    accent: false,
-  },
-  {
-    emoji: '📋',
-    title: 'Historico completo',
-    desc: 'Veja quando tomou, quando comprou, e quanto gastou. Informacao organizada para levar ao medico na proxima consulta.',
-    tag: 'Historico de saude',
-    accent: false,
-  },
-  {
-    emoji: '🔒',
-    title: 'Seguro e privado',
-    desc: 'Seus dados de saude sao seus. Nunca vendemos suas informacoes. Sem anuncios, sem rastreamento de terceiros.',
-    tag: '100% privado',
-    accent: false,
-  },
-]
-
-function Features() {
-  return (
-    <section className="features" id="funcoes">
-      <div className="section-label">O que fazemos</div>
-      <h2 className="section-title">Tudo que voce precisa, num so lugar.</h2>
-      <div className="features-grid">
-        {FEATURE_CARDS.map((c) => (
-          <div key={c.title} className={`feature-card reveal${c.accent ? ' accent' : ''}`}>
-            <span className="feature-emoji">{c.emoji}</span>
-            <h3 className="feature-title">{c.title}</h3>
-            <p className="feature-desc">{c.desc}</p>
-            <span className="feature-tag">{c.tag}</span>
-          </div>
-        ))}
+    <h1>Nunca fique sem<br>seus <em>remedios.</em></h1>
+    <p class="hero-sub">O app que calcula quando seus remedios vao acabar, avisa antes e encontra a melhor opcao de compra com entrega.</p>
+    <div class="cta-row">
+      <a href="#cta" class="btn-primary">&#9993; Criar conta gratuita</a>
+      <a href="#como" class="btn-ghost">Ver como funciona &rarr;</a>
+    </div>
+    <div class="stat-row">
+      <div class="stat-item">
+        <strong>ate 30%</strong>
+        <span>de economia potencial</span>
       </div>
-    </section>
-  )
-}
+      <div class="stat-item">
+        <strong>R$0</strong>
+        <span>para testar</span>
+      </div>
+      <div class="stat-item">
+        <strong>3+ dias</strong>
+        <span>de aviso antecipado</span>
+      </div>
+    </div>
+  </div>
 
-/* ─── HOW IT WORKS ───────────────────────────────── */
-const STEPS = [
-  {
-    title: 'Cadastre seus remedios',
-    desc: 'Nome, dosagem, frequencia e quantos comprimidos voce tem agora. Leva menos de 1 minuto por remedio.',
-  },
-  {
-    title: 'O app calcula tudo',
-    desc: 'Automaticamente encontra a data que seu estoque acaba e programa os alertas certos para voce.',
-  },
-  {
-    title: 'Receba o alerta',
-    desc: 'Notificacao no celular com dias de antecedencia  --  junto com opcoes de compra com entrega.',
-  },
-  {
-    title: 'Compre com tranquilidade',
-    desc: 'Sem correria de ultimo momento. Voce decide onde e quando comprar, com informacao na mao.',
-  },
-]
+  <div class="hero-right">
+    <div class="phone-wrap">
 
-const PHARMACIES = [
-  { icon: '🏆', bg: 'rgba(0,200,150,.15)', name: 'Farmacia A', delivery: '✓ Entrega em 2h · gratis', price: 'R$ 12,90', best: true },
-  { icon: '💊', bg: 'rgba(255,255,255,.08)', name: 'Farmacia B', delivery: 'Entrega em 24h · R$ 8,90', price: 'R$ 17,40', best: false },
-  { icon: '🏥', bg: 'rgba(255,255,255,.08)', name: 'Farmacia C', delivery: 'Entrega em 48h · gratis', price: 'R$ 19,90', best: false },
-]
+      <div class="float-card price-card">
+        <div class="float-label">&#128138; Omeprazol 20mg</div>
+        <div class="float-price">R$ 12,90</div>
+        <div class="float-savings">Opcao mais em conta encontrada</div>
+      </div>
 
-function HowItWorks() {
-  return (
-    <section className="how" id="como">
-      <div className="how-left">
-        <div className="section-label">Como funciona</div>
-        <h2 className="section-title" style={{ color: '#fff' }}>
-          Simples como deveria ser.
-        </h2>
-        <div className="steps">
-          {STEPS.map((s, i) => (
-            <div key={s.title} className="step reveal">
-              <div className="step-num">{i + 1}</div>
-              <div>
-                <div className="step-title">{s.title}</div>
-                <div className="step-desc">{s.desc}</div>
-              </div>
-            </div>
-          ))}
+      <div class="float-card alert-card">
+        <div class="float-alert-icon">&#9200;</div>
+        <div class="float-alert-msg">Atenolol acaba em<br><strong>3 dias</strong> &mdash; hora de comprar</div>
+      </div>
+
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen-top">
+          <div class="phone-greeting">Bom dia,</div>
+          <div class="phone-name">Maria Silva &#128075;</div>
+          <div class="next-dose">
+            <div class="next-dose-label">Proxima dose</div>
+            <div class="next-dose-name">Metformina 850mg</div>
+            <div class="next-dose-time">&#9200; Hoje as 14:00 &middot; 1 comprimido</div>
+          </div>
         </div>
-      </div>
-
-      <div className="how-right reveal">
-        <div className="price-table">
-          <div className="price-table-title">💊 Atenolol 25mg · 30 comprimidos</div>
-          <div className="price-table-sub">Exemplo de comparacao · valores ilustrativos</div>
-
-          {PHARMACIES.map((p) => (
-            <div key={p.name} className={`price-row${p.best ? ' best' : ''}`}>
-              <div className="price-pharmacy">
-                <div className="pharmacy-icon" style={{ background: p.bg }}>{p.icon}</div>
-                <div>
-                  <div className="pharmacy-name">{p.name}</div>
-                  <div className="pharmacy-delivery">{p.delivery}</div>
-                </div>
-              </div>
-              <div className="price-value">
-                <div className="price-amount" style={p.best ? { color: 'var(--pill)' } : undefined}>
-                  {p.price}
-                </div>
-                {p.best && <div className="price-best-badge">🏅 Melhor opcao</div>}
-              </div>
+        <div class="med-list">
+          <div class="med-card">
+            <div class="med-icon green">&#128138;</div>
+            <div class="med-info">
+              <div class="med-name">Atenolol 25mg</div>
+              <div class="med-detail">1x ao dia &middot; manha</div>
             </div>
-          ))}
-
-          <div className="price-tip">
-            💡 Voce poderia economizar ate R$ 7,00 nesse remedio escolhendo a melhor opcao
+            <span class="med-stock low">3 dias</span>
           </div>
-          <div className="price-table-disclaimer">
-            * Valores e farmacias ilustrativos. Precos reais virao da integracao com parceiros.
+          <div class="med-card">
+            <div class="med-icon red">&#128308;</div>
+            <div class="med-info">
+              <div class="med-name">Losartana 50mg</div>
+              <div class="med-detail">2x ao dia</div>
+            </div>
+            <span class="med-stock out">Acabou!</span>
+          </div>
+          <div class="med-card">
+            <div class="med-icon gold">&#10024;</div>
+            <div class="med-info">
+              <div class="med-name">Omeprazol 20mg</div>
+              <div class="med-detail">1x ao dia &middot; em jejum</div>
+            </div>
+            <span class="med-stock ok">28 dias</span>
           </div>
         </div>
       </div>
-    </section>
-  )
-}
+    </div>
+  </div>
+</section>
 
-/* ─── ALERTS ─────────────────────────────────────── */
-const NOTIFS = [
-  {
-    iconCls: 'red',
-    icon: '🚨',
-    title: 'Losartana esta acabando!',
-    msg: 'Voce tem apenas 2 comprimidos restantes. Recomendamos comprar hoje para nao ficar sem.',
-    time: 'Agora · DoseCerta',
-  },
-  {
-    iconCls: 'green',
-    icon: '💸',
-    title: 'Opcao mais barata encontrada',
-    msg: 'Encontramos uma opcao melhor para Atenolol 25mg. Confira antes de comprar.',
-    time: 'Ha 3 minutos · DoseCerta',
-  },
-  {
-    iconCls: 'blue',
-    icon: '⏰',
-    title: 'Hora do remedio  --  14:00',
-    msg: 'Metformina 850mg · 1 comprimido com o almoco.',
-    time: 'Hoje as 14:00 · DoseCerta',
-  },
-  {
-    iconCls: 'green',
-    icon: '✅',
-    title: 'Estoque atualizado',
-    msg: 'Atenolol registrado: 30 comprimidos. Proximo aviso em 27 dias.',
-    time: 'Ha 12 minutos · DoseCerta',
-  },
-]
+<!-- FEATURES -->
+<section class="features" id="funcoes">
+  <div class="section-label">O que fazemos</div>
+  <h2 class="section-title">Tudo que voce precisa, num so lugar.</h2>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <span class="feature-emoji">&#129518;</span>
+      <h3 class="feature-title">Calcula automaticamente</h3>
+      <p class="feature-desc">Informe sua dosagem e quantidade. O app calcula exatamente quando seu estoque acaba &mdash; sem planilha, sem conta de cabeca.</p>
+      <span class="feature-tag">Calculo inteligente</span>
+    </div>
+    <div class="feature-card accent reveal">
+      <span class="feature-emoji">&#128276;</span>
+      <h3 class="feature-title">Avisa antes de acabar</h3>
+      <p class="feature-desc">Notificacoes com 7, 3 e 1 dia de antecedencia. Voce nunca mais vai chegar na ultima caixa sem saber o que fazer.</p>
+      <span class="feature-tag">Alertas inteligentes</span>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-emoji">&#128176;</span>
+      <h3 class="feature-title">Encontra opcoes de compra</h3>
+      <p class="feature-desc">Mostra alternativas de compra com entrega na sua cidade. Compare e escolha o que faz mais sentido para voce.</p>
+      <span class="feature-tag">Comparacao de precos</span>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-emoji">&#128106;</span>
+      <h3 class="feature-title">Para toda a familia</h3>
+      <p class="feature-desc">Cadastre os remedios de todos. Ideal para quem cuida dos pais, filhos ou qualquer pessoa que depende de medicacao continua.</p>
+      <span class="feature-tag">Multi-perfil</span>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-emoji">&#128203;</span>
+      <h3 class="feature-title">Historico completo</h3>
+      <p class="feature-desc">Veja quando tomou, quando comprou, e quanto gastou. Informacao organizada para levar ao medico na proxima consulta.</p>
+      <span class="feature-tag">Historico de saude</span>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-emoji">&#128274;</span>
+      <h3 class="feature-title">Seguro e privado</h3>
+      <p class="feature-desc">Seus dados de saude sao seus. Nunca vendemos suas informacoes. Sem anuncios, sem rastreamento de terceiros.</p>
+      <span class="feature-tag">100% privado</span>
+    </div>
+  </div>
+</section>
 
-function AlertsSection() {
-  return (
-    <section className="alert-section" id="alertas">
-      <div className="alert-right reveal" style={{ order: 2 }}>
-        <div className="section-label">Alertas inteligentes</div>
-        <h2 className="section-title">
-          Notificacoes que<br />realmente importam.
-        </h2>
-        <p className="alert-desc">
-          Chega de post-it no espelho. Chega de WhatsApp para familiar lembrando
-          de comprar. O app avisa voce com antecedencia suficiente para nao correr.
-        </p>
-        <a href="#cta" className="btn-primary" style={{ width: 'fit-content' }}>
-          Criar conta gratuita &rarr;
-        </a>
+<!-- HOW IT WORKS -->
+<section class="how" id="como">
+  <div class="how-left">
+    <div class="section-label">Como funciona</div>
+    <h2 class="section-title" style="color:#fff">Simples como deveria ser.</h2>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Cadastre seus remedios</div>
+          <div class="step-desc">Nome, dosagem, frequencia e quantos comprimidos voce tem agora. Leva menos de 1 minuto por remedio.</div>
+        </div>
       </div>
-
-      <div className="alert-mockups reveal" style={{ order: 1 }}>
-        {NOTIFS.map((n) => (
-          <div key={n.title} className="notif-card">
-            <div className={`notif-icon-wrap ${n.iconCls}`}>{n.icon}</div>
-            <div>
-              <div className="notif-title">{n.title}</div>
-              <div className="notif-msg">{n.msg}</div>
-              <div className="notif-time">{n.time}</div>
-            </div>
-          </div>
-        ))}
+      <div class="step reveal">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">O app calcula tudo</div>
+          <div class="step-desc">Automaticamente encontra a data que seu estoque acaba e programa os alertas certos para voce.</div>
+        </div>
       </div>
-    </section>
-  )
-}
+      <div class="step reveal">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Receba o alerta</div>
+          <div class="step-desc">Notificacao no celular com dias de antecedencia &mdash; junto com opcoes de compra com entrega.</div>
+        </div>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Compre com tranquilidade</div>
+          <div class="step-desc">Sem correria de ultimo momento. Voce decide onde e quando comprar, com informacao na mao.</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-/* ─── CTA ────────────────────────────────────────── */
-function CtaSection() {
-  const [email, setEmail] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-  const [error, setError] = useState(false)
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!email || !email.includes('@')) {
-      setError(true)
-      return
-    }
-    try {
-      await fetch('/early-access.html', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: encode({ 'form-name': 'early-access', email }),
-      })
-    } catch {
-      // fail silently  --  still show success to user
-    }
-    setSubmitted(true)
-  }
-
-  return (
-    <section className="cta-section" id="cta">
-      <span className="section-label cta-label">Acesso antecipado</span>
-      <h2 className="cta-title">
-        Pronto para nunca<br />ficar sem <em>remedios?</em>
-      </h2>
-      <p className="cta-sub">
-        Crie seu acesso gratuito e seja uma das primeiras pessoas a testar o DoseCerta.
-      </p>
-
-      {submitted ? (
-        <p className="success-msg">
-          🎉 Acesso criado! Vamos te avisar quando a versao de teste estiver disponivel.
-        </p>
-      ) : (
-        <form onSubmit={handleSubmit} className="cta-form">
-          <input type="hidden" name="form-name" value="early-access" />
-          <div className="input-row">
-            <input
-              type="email"
-              name="email"
-              className={`email-input${error ? ' input-error' : ''}`}
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setError(false) }}
-              required
-            />
-            <button type="submit" className="btn-primary">
-              Criar acesso &rarr;
-            </button>
+  <div class="how-right reveal">
+    <div class="price-table">
+      <div class="price-table-title">&#128138; Atenolol 25mg &middot; 30 comprimidos</div>
+      <div class="price-table-sub">Exemplo de comparacao &middot; valores ilustrativos</div>
+      <div class="price-row best">
+        <div class="price-pharmacy">
+          <div class="pharmacy-icon" style="background:rgba(0,200,150,.15)">&#127942;</div>
+          <div>
+            <div class="pharmacy-name">Farmacia A</div>
+            <div class="pharmacy-delivery">&#10003; Entrega em 2h &middot; gratis</div>
           </div>
-        </form>
-      )}
+        </div>
+        <div class="price-value">
+          <div class="price-amount" style="color:var(--pill)">R$ 12,90</div>
+          <div class="price-best-badge">&#127885; Melhor opcao</div>
+        </div>
+      </div>
+      <div class="price-row">
+        <div class="price-pharmacy">
+          <div class="pharmacy-icon" style="background:rgba(255,255,255,.08)">&#128138;</div>
+          <div>
+            <div class="pharmacy-name">Farmacia B</div>
+            <div class="pharmacy-delivery">Entrega em 24h &middot; R$ 8,90</div>
+          </div>
+        </div>
+        <div class="price-value">
+          <div class="price-amount">R$ 17,40</div>
+        </div>
+      </div>
+      <div class="price-row">
+        <div class="price-pharmacy">
+          <div class="pharmacy-icon" style="background:rgba(255,255,255,.08)">&#127973;</div>
+          <div>
+            <div class="pharmacy-name">Farmacia C</div>
+            <div class="pharmacy-delivery">Entrega em 48h &middot; gratis</div>
+          </div>
+        </div>
+        <div class="price-value">
+          <div class="price-amount">R$ 19,90</div>
+        </div>
+      </div>
+      <div style="margin-top:16px; padding:12px 14px; background:rgba(0,200,150,.08); border-radius:12px; border:1px solid rgba(0,200,150,.2)">
+        <div style="font-size:13px; color:var(--pill); font-weight:500">&#128161; Voce poderia economizar ate R$ 7,00 nesse remedio escolhendo a melhor opcao</div>
+      </div>
+      <div class="price-table-disclaimer">* Valores e farmacias ilustrativos. Precos reais virao da integracao com parceiros.</div>
+    </div>
+  </div>
+</section>
 
-      <p className="cta-fine">Sem spam. Sem cartao. Cancele quando quiser.</p>
-    </section>
-  )
-}
+<!-- ALERTS SECTION -->
+<section class="alert-section" id="alertas">
+  <div class="alert-right reveal" style="order:2">
+    <div class="section-label">Alertas inteligentes</div>
+    <h2 class="section-title">Notificacoes que<br>realmente importam.</h2>
+    <p style="font-size:16px; line-height:1.7; color:#5A6A7A; max-width:380px; margin-bottom:28px">
+      Chega de post-it no espelho. Chega de WhatsApp para familiar lembrando de comprar. O app avisa voce com antecedencia suficiente para nao correr.
+    </p>
+    <a href="#cta" class="btn-primary" style="width:fit-content">Criar conta gratuita &rarr;</a>
+  </div>
+  <div class="alert-mockups reveal" style="order:1">
+    <div class="notif-card">
+      <div class="notif-icon-wrap red">&#128680;</div>
+      <div>
+        <div class="notif-title">Losartana esta acabando!</div>
+        <div class="notif-msg">Voce tem apenas 2 comprimidos restantes. Recomendamos comprar hoje para nao ficar sem.</div>
+        <div class="notif-time">Agora &middot; DoseCerta</div>
+      </div>
+    </div>
+    <div class="notif-card">
+      <div class="notif-icon-wrap green">&#128184;</div>
+      <div>
+        <div class="notif-title">Opcao mais barata encontrada</div>
+        <div class="notif-msg">Encontramos uma opcao melhor para Atenolol 25mg. Confira antes de comprar.</div>
+        <div class="notif-time">Ha 3 minutos &middot; DoseCerta</div>
+      </div>
+    </div>
+    <div class="notif-card">
+      <div class="notif-icon-wrap blue">&#9200;</div>
+      <div>
+        <div class="notif-title">Hora do remedio &mdash; 14:00</div>
+        <div class="notif-msg">Metformina 850mg &middot; 1 comprimido com o almoco.</div>
+        <div class="notif-time">Hoje as 14:00 &middot; DoseCerta</div>
+      </div>
+    </div>
+    <div class="notif-card">
+      <div class="notif-icon-wrap green">&#9989;</div>
+      <div>
+        <div class="notif-title">Estoque atualizado</div>
+        <div class="notif-msg">Atenolol registrado: 30 comprimidos. Proximo aviso em 27 dias.</div>
+        <div class="notif-time">Ha 12 minutos &middot; DoseCerta</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <span class="section-label" style="display:block; margin-bottom:16px">Acesso antecipado</span>
+  <h2 class="cta-title">Pronto para nunca<br>ficar sem <em>remedios?</em></h2>
+  <p class="cta-sub">Crie seu acesso gratuito e seja uma das primeiras pessoas a testar o DoseCerta.</p>
+  <form name="early-access" method="POST" data-netlify="true">
+  <input type="hidden" name="form-name" value="early-access">
+  <div class="input-row">
+    <input
+      type="email"
+      name="email"
+      class="email-input"
+      placeholder="seu@email.com"
+      required
+    >
+    <button class="btn-primary" type="submit">
+      Criar acesso &rarr;
+    </button>
+  </div>
+</form>
+  <p style="margin-top:16px; font-size:12px; color:rgba(255,255,255,.3)">Sem spam. Sem cartao. Cancele quando quiser.</p>
+</section>
+
+<script>
+var reveals = document.querySelectorAll('.reveal');
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e, i) {
+    if (e.isIntersecting) {
+      setTimeout(function() { e.target.classList.add('visible'); }, i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+reveals.forEach(function(r) { observer.observe(r); });
+</script>
+</body>
+</html>
